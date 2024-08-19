@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { bcrypt } from 'src/common/helpers/bcrypt';
+import { UserAvatarDto } from './dto';
 
 @Injectable()
 export class UsersService {
@@ -49,11 +50,25 @@ export class UsersService {
       };
   };
 
+  async updateAvatar(id: string, userAvatarDto: UserAvatarDto) {
+    const updatedUser = await this.usersRepository.update(id, userAvatarDto);
+    if(updatedUser.affected === 0) {
+      throw new NotFoundException('User not found');
+    };
+  }
+
   async remove(id: string) {
     const deletedUser = await this.usersRepository.update(id, {isActive: false}); // Soft delete
     if(deletedUser.affected === 0) {
       throw new NotFoundException('User not found');
     };
+  };
+
+  async hardDelete(id: string) {
+    const deletedUser = await this.usersRepository.delete(id); // Hard delete
+    if(deletedUser.affected === 0) {
+      throw new NotFoundException('User not found');
+    }
   };
 
   async hashPassword(password: string): Promise<string> {

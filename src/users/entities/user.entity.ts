@@ -24,6 +24,9 @@ export class User {
     })
     roles: string[];
 
+    @Column('text')
+    avatar?: string;
+
     @Column('bool', {default: true})
     isActive: boolean;
 

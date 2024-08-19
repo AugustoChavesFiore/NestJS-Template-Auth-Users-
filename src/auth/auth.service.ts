@@ -70,5 +70,7 @@ export class AuthService {
         await this.usersService.update(user.id, { password: hashedPassword });
     };
 
+    
+
 
 }
