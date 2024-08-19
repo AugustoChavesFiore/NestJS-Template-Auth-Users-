@@ -5,7 +5,8 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { bcrypt } from 'src/common/helpers/bcrypt';
-import { UserAvatarDto } from './dto';
+import { ChangeRoleDto, UserAvatarDto } from './dto';
+import { ValidRoles } from 'src/auth/interfaces';
 
 @Injectable()
 export class UsersService {
@@ -55,7 +56,17 @@ export class UsersService {
     if(updatedUser.affected === 0) {
       throw new NotFoundException('User not found');
     };
-  }
+  };
+
+  async changeRole(id: string, changeRoleDto: ChangeRoleDto) {
+    if(changeRoleDto.roles.includes(ValidRoles.SUPERADMIN)) {
+      throw new BadRequestException('You cannot assign SUPERADMIN role');
+    };
+    const updatedUser = await this.usersRepository.update(id, changeRoleDto);
+    if(updatedUser.affected === 0) {
+      throw new NotFoundException('User not found');
+    };
+  };
 
   async remove(id: string) {
     const deletedUser = await this.usersRepository.update(id, {isActive: false}); // Soft delete
